@@ -15,7 +15,7 @@ This library is able to decode miscellaneous images those are taken with a file,
 ## Requirements
 
  * g++ / VC++6
- * [http://www.sourceforge.net/projects/opencvlibrary/ OpenCV] 0.9.7 or later
+ * [OpenCV](http://www.sourceforge.net/projects/opencvlibrary/) 0.9.7 or later
  * Gtk2 for UN*X (required by OpenCV) 
 
 ## Download
@@ -26,7 +26,7 @@ Sorry, Not available yet.
 
 ### Latest Stable Source Code
 
- * version 0.9.3 http://http://trac.koka-in.org/libdecodeqr/attachment/wiki/WikiStart/libdecodeqr-0.9.3.tar.bz2
+ * version 0.9.3 http://trac.koka-in.org/libdecodeqr/attachment/wiki/WikiStart/libdecodeqr-0.9.3.tar.bz2
 
 ### Latest Development Source Code
 
@@ -44,7 +44,9 @@ see BuildAndInstall for detail.
 
  1. open $(archive_dir)/src/libdecodeqr/libdecodeqr.dsw
  1. build the project (press [F7] key)
+
 or
+
  1. start command prompt
  1. run VCVARS32.BAT
  1. nmake libdecodeqr.mak
@@ -61,16 +63,16 @@ After building, set places of decodeqr.h, qrtypes.h, qrerror.h and libdecodeqr.l
 
 ### API Reference
 
-see ApiReference
+see [ApiReference](https://github.com/chai2010/qrcode/blob/master/internal/libdecodeqr/doc/ApiReference.ja)
 
 ### Sample Codes
 
- * [source:trunk/src/sample/simple/simpletest.cpp#latest simple usage]
- * [source:trunk/src/sample/webcam/webcam.cpp#latest with webcam]
+ * [latest simple usage](https://github.com/chai2010/qrcode/tree/master/internal/libdecodeqr/examples/simple/simpletest.cpp)
+ * [latest with webcam](https://github.com/chai2010/qrcode/tree/master/internal/libdecodeqr/examples/webcam/webcam.cpp)
 
 ## How to Hack
 
-see HackingGuide
+see [HackingGuide](https://github.com/chai2010/qrcode/blob/master/internal/libdecodeqr/doc/HackingGuide.ja)
 
 ## Contact Us
 
@@ -94,9 +96,12 @@ in the mail body (not subject) to the address <libdecodeqr-ctl@koka-in.org>.
 
 ## Copying
 
+```
 Copyright (c) 2007 NISHI Takao <zophos@koka-in.org>, 
 JMA (Japan Medical Association) and 
 !NaCl (Network Applied Communication Laboratory Ltd.) All rights reserved.[[BR]]
 This is free software with ABSOLUTELY NO WARRANTY.
 
 You can redistribute and/or modify it under the terms of LGPL.
+```
+
