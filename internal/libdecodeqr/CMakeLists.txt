@@ -290,6 +290,7 @@ set(libdecodeqr_SRC
 #------------------------------------------------------------------------------
 
 add_library(decodeqrLib SHARED
+	./libdecodeqr/libdecodeqr.def
 	${libdecodeqr_SRC}
 	${OPENCV_SRC}
 )

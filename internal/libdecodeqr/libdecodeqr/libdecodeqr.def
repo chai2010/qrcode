@@ -1,0 +1,32 @@
+; Copyright 2014 <chaishushan{AT}gmail.com>. All rights reserved.
+; Use of this source code is governed by a BSD-style
+; license that can be found in the LICENSE file.
+
+EXPORTS
+
+	qr_decoder_open
+	qr_decoder_open_with_image_size
+	qr_decoder_close
+	qr_decoder_get_status
+	qr_decoder_is_busy
+	qr_decoder_set_image_size
+	qr_decoder_set_image_buffer
+	qr_decoder_get_image_buffer
+	qr_decoder_get_transformed_image_buffer
+	qr_decoder_get_binarized_image_buffer
+	qr_decoder_get_tmp_image_buffer
+	qr_decoder_decode
+	qr_decoder_decode_image
+	qr_decoder_get_header
+	qr_decoder_get_body
+	qr_decoder_get_coderegion_vertexes
+	qr_decoder_get_finderpattern_boxes
+	qr_decoder_version
+	qr_decoder_version_description
+	qr_decoder_version_product
+	qr_decoder_version_major
+	qr_decoder_version_minor
+	qr_decoder_version_teeny
+	qr_decoder_version_suffix
+	qr_decoder_version_revision
+
