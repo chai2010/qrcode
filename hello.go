@@ -8,8 +8,12 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
+	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"io/ioutil"
 	"log"
 	"os"
@@ -20,8 +24,9 @@ import (
 )
 
 var (
+	flagText   = flag.String("text", "chaishushan@gmail.com", "Set text")
 	flagLevel  = flag.String("n", "Q", "Set QR encode level(L|M|Q|H), default is 'Q'.")
-	flagOutput = flag.String("o", "qr.png", "Set output filename (PNG only).")
+	flagOutput = flag.String("o", "qrcode.png", "Set output filename (PNG only).")
 )
 
 func init() {
@@ -33,10 +38,6 @@ func init() {
 
 func main() {
 	flag.Parse()
-	if flag.NArg() < 1 {
-		flag.Usage()
-		os.Exit(-1)
-	}
 
 	filename := filepath.Clean(*flagOutput)
 	if filename == "" {
@@ -58,7 +59,7 @@ func main() {
 		level = qrcode.H
 	}
 
-	code, err := qrcode.Encode(flag.Arg(0), level)
+	code, err := qrcode.Encode(*flagText, level)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,5 +67,24 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Done")
+	fmt.Println("Save as:", filename)
+
+	// Load file data
+	data, err := ioutil.ReadFile("testdata/01-1.jpg")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Decode image
+	m, _, err := image.Decode(bytes.NewReader(data))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Decode QR Code
+	text, err := qrcode.Decode(m)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("testdata/01-1.jpg:", text)
 }

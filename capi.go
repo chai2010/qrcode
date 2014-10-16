@@ -13,8 +13,37 @@ package qrcode
 #cgo linux pkg-config: gtk+-2.0 gstreamer-0.10 libxine libavdevice libavformat libavfilter libavcodec libswscale libavutil
 
 #include "decodeqr.h"
+
+void cgoReleaseIplImage(IplImage* img) {
+	cvReleaseImage(&img);
+}
+
+struct cgo_qr_decoder_get_header_return {
+	int ok;
+	QrCodeHeader header;
+} cgo_qr_decoder_get_header(QrDecoderHandle p) {
+	struct cgo_qr_decoder_get_header_return t;
+	t.ok = qr_decoder_get_header(p, &t.header);
+	return t;
+}
+
+char* cgo_qr_decoder_get_text(QrDecoderHandle p) {
+	QrCodeHeader header;
+	if(qr_decoder_get_header(p, &header)) {
+		char *buf = calloc(header.byte_size+1, 1);
+		qr_decoder_get_body(p, (unsigned char *)buf, header.byte_size+1);
+		return buf;
+	}
+	return NULL;
+}
+
 */
 import "C"
+import (
+	"image"
+	"image/color"
+	"unsafe"
+)
 
 // ----------------------------------------------------------------------------
 // cv.h
@@ -25,6 +54,61 @@ type (
 	_CvBox2D  C.CvBox2D
 	_IplImage C.IplImage
 )
+
+const (
+	_IPL_DEPTH_8U = int(C.IPL_DEPTH_8U)
+)
+
+func newRGBIplImage(m image.Image) *_IplImage {
+	b := m.Bounds()
+	p := C.cvCreateImage(C.cvSize(C.int(b.Dx()), C.int(b.Dy())), C.IPL_DEPTH_8U, 3)
+	pix := ((*[1 << 30]byte)(unsafe.Pointer(p.imageData)))[0 : b.Dx()*b.Dy()*3 : b.Dx()*b.Dy()*3]
+
+	switch m := m.(type) {
+	case *image.Gray:
+		for y := b.Min.Y; y < b.Max.Y; y++ {
+			off := 0
+			for x := b.Min.X; x < b.Max.X; x++ {
+				//println("gray, off = ", off, x, y)
+				gray := m.GrayAt(x, y)
+				pix[off+0] = gray.Y
+				pix[off+1] = gray.Y
+				pix[off+2] = gray.Y
+				off += 3
+			}
+			pix = pix[int(p.widthStep):]
+		}
+	case *image.RGBA:
+		for y := b.Min.Y; y < b.Max.Y; y++ {
+			off := 0
+			for x := b.Min.X; x < b.Max.X; x++ {
+				rgba := m.RGBAAt(x, y)
+				pix[off+0] = rgba.R
+				pix[off+1] = rgba.G
+				pix[off+2] = rgba.B
+				off += 3
+			}
+			pix = pix[int(p.widthStep):]
+		}
+	default:
+		for y := b.Min.Y; y < b.Max.Y; y++ {
+			off := 0
+			for x := b.Min.X; x < b.Max.X; x++ {
+				rgba := color.RGBAModel.Convert(m.At(x, y)).(color.RGBA)
+				pix[off+0] = rgba.R
+				pix[off+1] = rgba.G
+				pix[off+2] = rgba.B
+				off += 3
+			}
+			pix = pix[int(p.widthStep):]
+		}
+	}
+	return (*_IplImage)(p)
+}
+
+func (p *_IplImage) Release() {
+	C.cgoReleaseIplImage((*C.IplImage)(p))
+}
 
 // ----------------------------------------------------------------------------
 // qrerror.h
@@ -81,15 +165,6 @@ type (
 	_QrDecoderHandle C.QrDecoderHandle
 	_QrCodeHeader    C.QrCodeHeader
 )
-
-// same as C.QrCodeHeader
-type qrCodeHeader struct {
-	Model         int32
-	Version       int32
-	Level         int32
-	CharactorSize int32
-	ByteSize      int32
-}
 
 // ----------------------------------------------------------------------------
 // decodeqr.h
@@ -301,9 +376,13 @@ func qr_decoder_decode_image(p _QrDecoderHandle, src *_IplImage, adaptive_th_siz
 // RETURN:
 //   1 (on success)||0 (on error)
 //
-func qr_decoder_get_header(p _QrDecoderHandle, header *_QrCodeHeader) int {
-	v := C.qr_decoder_get_header(C.QrDecoderHandle(p), (*C.QrCodeHeader)(header))
-	return int(v)
+func qr_decoder_get_header(p _QrDecoderHandle) (header _QrCodeHeader, ok bool) {
+	rv := C.cgo_qr_decoder_get_header(C.QrDecoderHandle(p))
+	header = _QrCodeHeader(rv.header)
+	if rv.ok != 0 {
+		ok = true
+	}
+	return
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -327,6 +406,12 @@ func qr_decoder_get_body(p _QrDecoderHandle, buf []byte) int {
 	defer cgoFreePtr(cBuf)
 	v := C.qr_decoder_get_body(C.QrDecoderHandle(p), (*C.uchar)(cBuf), C.int(len(buf)))
 	return int(v)
+}
+
+func cgo_qr_decoder_get_text(p _QrDecoderHandle) string {
+	cs := C.cgo_qr_decoder_get_text(C.QrDecoderHandle(p))
+	defer C.free(unsafe.Pointer(cs))
+	return C.GoString(cs)
 }
 
 /////////////////////////////////////////////////////////////////////////
