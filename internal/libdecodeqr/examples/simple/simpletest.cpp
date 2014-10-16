@@ -17,11 +17,13 @@
 
 int main(int argc,char *argv[])
 {
+	const char* filename = (argc>1)? argv[1]: "img/qrcode.jpg";
+
     cvNamedWindow("src",1);
     //
     // load image
     //
-    IplImage *src=cvLoadImage(argv[1],1);
+    IplImage *src=cvLoadImage(filename,1);
     cvShowImage("src",src);
 
     //

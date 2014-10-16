@@ -11,6 +11,7 @@
 //
 // $Id$
 //
+#include "decodeqr.h"
 #include "imagereader.h"
 #include "qrtypes.h"
 #include "version.h"
